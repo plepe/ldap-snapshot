@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+open F, "ldapsearch @ARGV|";
+$R = null;
+while (my $line = <F>) {
+  if ($line =~ /^$/) {
+    # ignore empty lines
+  }
+  elsif ($line =~ /^# (.*)/) {
+    my @path = split(/, /, $1);
+
+    if (scalar(@path) > 1) {
+      @p = @path[1..$#path];
+      $dir = join '/', reverse(@p);
+      `mkdir -p $dir`;
+      open $R, ">$dir/$path[0].ldif";
+    }
+  }
+  elsif ($R) {
+    print $R $line;
+  }
+}
+close F;
